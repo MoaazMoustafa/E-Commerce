@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
 from .forms import ListingForm
@@ -71,6 +72,7 @@ def index(request):
     return render(request, "auctions/index.html", {'listings': listings})
 
 
+@login_required
 def create_listing(request):
     form = ListingForm()
     if request.method == "GET":
@@ -82,6 +84,7 @@ def create_listing(request):
             return redirect('index')
 
 
+@login_required
 def detail_listing(request, id):
     listing = get_object_or_404(Listing, id=id)
     count_bid = Bid.objects.filter(listing=listing).count()
@@ -89,6 +92,7 @@ def detail_listing(request, id):
     return render(request, 'auctions/detail-listing.html', {'listing': listing, 'count_bid': count_bid, 'comments': comments})
 
 
+@login_required
 def place_bid(request, id):
     listing = get_object_or_404(Listing, id=id)
     count_bid = Bid.objects.filter(listing=listing).count()
@@ -118,6 +122,7 @@ def place_bid(request, id):
                                                                         'message': 'You placed a bid with the same price before', 'color': 'red'})
 
 
+@login_required
 def add_comment(request, id):
     listing = get_object_or_404(Listing, id=id)
     user = request.user
@@ -129,6 +134,7 @@ def add_comment(request, id):
     return redirect(f'/detail/{id}')
 
 
+@login_required
 def watchlist(request, id):
     # print(kwargs)
     if request.method == "POST":
